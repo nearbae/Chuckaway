@@ -50,7 +50,20 @@ public final class AppScanner: Sendable {
             }
         }
 
-        return results.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        // 3. Deduplicate by bundle identifier, preferring /Applications over Downloads/temporary paths
+        var uniqueApps: [String: AppModel] = [:]
+        for app in results {
+            let key = app.bundleIdentifier ?? app.url.standardizedFileURL.path
+            if let existing = uniqueApps[key] {
+                if !existing.url.path.hasPrefix("/Applications") && app.url.path.hasPrefix("/Applications") {
+                    uniqueApps[key] = app
+                }
+            } else {
+                uniqueApps[key] = app
+            }
+        }
+
+        return Array(uniqueApps.values).sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
     private func scanDirectory(_ dir: URL, depth: Int, seenURLs: inout Set<URL>, results: inout [AppModel]) {
@@ -112,12 +125,14 @@ public final class AppScanner: Sendable {
     }
 
     private func isValidAppPath(_ path: String) -> Bool {
-        // Exclude Trash, Dev Platforms, CommandLineTools, DerivedData, internal build
+        // Exclude Trash, Dev Platforms, CommandLineTools, DerivedData, internal build, dist
         if path.contains("/.Trash/") ||
             path.contains("/Contents/Developer/") ||
             path.contains("/Library/Developer/") ||
             path.contains("/DerivedData/") ||
             path.contains("/.build/") ||
+            path.contains("/dist/") ||
+            path.contains("/build/Build/Products/") ||
             path.contains("/.git/") {
             return false
         }
@@ -144,12 +159,26 @@ public final class AppScanner: Sendable {
 
     public func parseApp(at url: URL) -> AppModel? {
         guard url.pathExtension == "app" else { return nil }
+
+        // Never list Chuckaway itself for uninstallation
+        if url.lastPathComponent == "Chuckaway.app" ||
+           url.lastPathComponent == "App Eraser.app" ||
+           url.standardizedFileURL == Bundle.main.bundleURL.standardizedFileURL {
+            return nil
+        }
+
         guard let bundle = Bundle(url: url) else {
             let fallbackName = url.deletingPathExtension().lastPathComponent
             return AppModel(name: fallbackName, url: url)
         }
 
         let bundleId = bundle.bundleIdentifier
+
+        // Also check bundle identifier to never uninstall self
+        if bundleId == "com.local.Chuckaway" || bundleId == "com.local.AppEraser" || bundleId == Bundle.main.bundleIdentifier {
+            return nil
+        }
+
         let displayName = (bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String)
             ?? (bundle.object(forInfoDictionaryKey: "CFBundleName") as? String)
             ?? url.deletingPathExtension().lastPathComponent
