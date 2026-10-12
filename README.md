@@ -2,7 +2,7 @@
 
 A native macOS application designed to thoroughly uninstall apps and eliminate all associated residues, including system library data (`~/Library`: Application Support, Caches, Preferences, Containers, Group Containers, Logs, Saved Application State, WebKit, HTTPStorages, LaunchAgents) and local dotfile/XDG directories (`~/.<app>`, `~/.config`, `~/.cache`, `~/.local/state`, `~/.local/share`).
 
-![App Icon](Resources/AppIcon.icns)
+![Chuckaway Icon](Resources/AppIcon.png)
 
 ## Key Features
 
