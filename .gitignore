@@ -1,0 +1,17 @@
+# Swift Package Manager
+.build/
+Packages/
+.swiftpm/
+*.xcodeproj
+*.xcworkspace
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Distribution artifacts
+dist/
