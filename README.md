@@ -1,39 +1,47 @@
-# Chuckaway 🧹
+# Chuckaway
 
-Aplikasi native macOS untuk membersihkan dan meng-uninstall aplikasi secara tuntas, termasuk seluruh file sisa (`~/Library`: Application Support, Caches, Preferences, Containers, Logs, Saved Application State, WebKit/HTTPStorages, LaunchAgents) serta folder data/CLI dotfiles (`~/.<app>`, `~/.config`, `~/.cache`, `~/.local/state`).
+A native macOS application designed to thoroughly uninstall apps and eliminate all associated residues, including system library data (`~/Library`: Application Support, Caches, Preferences, Containers, Group Containers, Logs, Saved Application State, WebKit, HTTPStorages, LaunchAgents) and local dotfile/XDG directories (`~/.<app>`, `~/.config`, `~/.cache`, `~/.local/state`, `~/.local/share`).
 
 ![App Icon](Resources/AppIcon.icns)
 
-## Fitur Utama
+## Key Features
 
-- 🔍 **Deteksi Aplikasi Otomatis**: Memindai seluruh aplikasi di `/Applications` dan `~/Applications`.
-- 📂 **Browse & Drag-and-Drop**: Pilih `.app` mana saja atau seret langsung file `.app` ke dalam jendela aplikasi.
-- 🧬 **Deep Residue & Dotfiles Detection**: Menelusuri seluruh file sisa di `~/Library` serta dotfiles/XDG data di Home direktori (seperti local AI models, CLI cache) menggunakan Bundle Identifier dan token nama aplikasi.
-- 🔒 **Proteksi Aplikasi Sistem**: Menandai dan mengunci aplikasi bawaan macOS agar tidak terhapus tanpa sengaja.
-- 🗑️ **Safe Trash Removal**: Memindahkan file ke **macOS Trash** via `FileManager.trashItem`, sehingga aman dan bisa di-restore kapan saja jika diperlukan.
-- ⚡ **Native Performa Tinggi**: Dibuat dengan Swift 6 & SwiftUI murni dengan penelusuran kernel POSIX `fts` secepat kilat tanpa runtime berat seperti Electron.
+- **Automatic Application Detection**: Scans installed applications across `/Applications`, `~/Applications`, and user directories.
+- **Browse & Drag-and-Drop**: Inspect any `.app` bundle via file selection or direct drag-and-drop onto the window.
+- **Deep Residue & Dotfile Detection**: Discovers associated remnants across `~/Library` and Home dotfile/XDG locations (including CLI tools and local AI model caches) using bundle identifiers and app tokens.
+- **System App Protection**: Flags and locks macOS built-in system applications to prevent unintended removal.
+- **Safe Trash Removal**: All removals route through macOS Trash (`FileManager.trashItem`), ensuring operations are fully recoverable.
+- **High-Performance Native Engine**: Built entirely with Swift 6 and SwiftUI, leveraging parallel POSIX `fts` kernel directory traversal for instant sizing without heavy runtime overhead.
 
-## Cara Menjalankan
+## Installation & Usage
 
-### Opsi 1: Menjalankan Aplikasi Langsung
-Buka aplikasi yang sudah di-bundle di folder `dist/`:
+### Prebuilt Release
+Download the latest `Chuckaway.dmg` from the GitHub Releases page, open the disk image, and drag `Chuckaway.app` into your Applications folder.
+
+To launch the packaged bundle directly:
 ```bash
 open "dist/Chuckaway.app"
 ```
 
-Atau copy `dist/Chuckaway.app` ke folder `/Applications` Anda:
+Or copy the app to `/Applications`:
 ```bash
 cp -R "dist/Chuckaway.app" /Applications/
 ```
 
-### Opsi 2: Build Ulang dari Source
-Untuk meng-compile ulang setelah melakukan perubahan:
-```bash
-./scripts/build_app.sh
-```
+### Building from Source
 
-Atau jalankan langsung dalam mode development:
+#### Requirements
+- macOS 14.0 or later (Sonoma, Sequoia)
+- Xcode 16+ or Swift 6.0 toolchain
+
+#### Development Run
 ```bash
 swift run
 ```
 
+#### Build Release App Bundle
+```bash
+./scripts/build_app.sh
+```
+
+The resulting application bundle will be created at `dist/Chuckaway.app`.
